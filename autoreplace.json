@@ -1,0 +1,5 @@
+{
+    "wb": "Welcome back",
+    "$greet": "func: greeting",
+    "@/": "func: greeting"
+}
