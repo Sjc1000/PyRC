@@ -2,4 +2,6 @@
 
 
 def run(c, newnickname):
-    pass
+    MainWindow = c['MainWindow']
+    MainWindow.servers[MainWindow.active_server]['connection'].send('NICK ' + newnickname)
+    return None

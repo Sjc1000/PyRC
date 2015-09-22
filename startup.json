@@ -1,6 +1,7 @@
 {
     "commands":
     [
-        "commands you want to use on startup go here."
+        "/server localhost",
+        "/server irc.drix.xyz --nickname Sjc1000 --port 52310 --password Sjc1000:qwerty"
     ]
 }

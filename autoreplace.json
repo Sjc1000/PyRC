@@ -1,5 +1,19 @@
 {
-    "wb": "Welcome back",
-    "$greet": "func: greeting",
-    "@/": "func: greeting"
+    "its": "it's",
+    "Its": "It's",
+    "Im": "I'm",
+    "im": "I'm",
+    "ill": "I'll",
+    "Ill": "I'll",
+    "itl": "it'l",
+    "Itl": "It'l",
+    "i": "I",
+    "dont": "don't",
+    "Dont": "Don't",
+    "yea": "yeah",
+    "Yea": "Yeah",
+    "Whats": "What's",
+    "whats": "what's",
+    "ive": "I've",
+    "Ive": "I've"
 }

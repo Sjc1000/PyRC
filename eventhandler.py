@@ -82,10 +82,19 @@ class _EventHandler():
     # TODO: MOTD stuffs here.
 
     def onPRIVMSG(self, connection, host, channel, *message):
+        if channel == connection.nickname:
+            channel = host.split('!')[0][1:]
         channel = channel.lower()
         if channel not in self.MainWindow.servers[connection.server]['channels']:
             self.MainWindow.add_channel(connection.server, channel)
-        self.MainWindow.add_text(connection.server, channel, timestamp() + ' [' + host.split('!')[0][1:] + '] ' + ' '.join(message)[1:])
+        if message[0].startswith(':\x01ACTION'):
+            self.MainWindow.add_text(connection.server, channel, '{} * {} {}'.format(timestamp(), host.split('!')[0][1:], ' '.join(message[1:]).replace('\x01', '')))
+        else:
+            self.MainWindow.add_text(connection.server, channel, timestamp() + ' [' + host.split('!')[0][1:] + '] ' + ' '.join(message)[1:])
+        if any(connection.nickname in x for x in message):
+            self.MainWindow.change_treeview_color(connection.server, channel, 'blue')
+        else:
+            self.MainWindow.change_treeview_color(connection.server, channel, 'red')
         return None
 
     def onJOIN(self, connection, host, channel):
@@ -99,17 +108,20 @@ class _EventHandler():
         else:
             self.MainWindow.add_user(connection.server, channel, host.split('!')[0][1:])
         self.MainWindow.add_text(connection.server, channel, '{} {} ({}) has joined {}'.format(timestamp(), host.split('!')[0][1:], host[1:],channel))
+        self.MainWindow.change_treeview_color(connection.server, channel, '#AA00AA')
         return None
 
-    def onPART(self, connection, host, channel):
+    def onPART(self, connection, host, channel, *message):
         if channel.startswith(':'):
             channel = channel[1:]
         channel = channel.lower()
-        if host.split('!')[0][1:] == connection.nickname:
-            self.MainWindow.remove_channel(connection.server, channel)
+        if host.split('!')[0][1:].lower() == connection.nickname.lower():
+            #self.MainWindow.remove_channel(connection.server, channel)
+            return None
         else:
             self.MainWindow.add_text(connection.server, channel, '{} {} ({}) has left {}'.format(timestamp(), host.split('!')[0][1:], host[1:], channel))
             self.MainWindow.remove_user(connection.server, channel, host.split('!')[0][1:])
+        self.MainWindow.change_treeview_color(connection.server, channel, '#AA00AA')
         return None
 
     def on353(self, connection, host, nickname, eq, channel, *userlist):
@@ -125,10 +137,11 @@ class _EventHandler():
         for channel in channels:
             if nickname in channels[channel]['users']:
                 self.MainWindow.add_text(connection.server, channel, '{} {}'
-                    '({}) has quit {} ({})'.format(timestamp(),
+                    ' ({}) has quit {} ({})'.format(timestamp(),
                     host.split('!')[0][1:], host[1:],channel,
                     ' '.join(quit_message)))
                 self.MainWindow.remove_user(connection.server, channel, nickname)
+                self.MainWindow.change_treeview_color(connection.server, channel, '#AA00AA')
         return None
 
     def onNOTICE(self, connection, host, channel, *message):
@@ -139,6 +152,57 @@ class _EventHandler():
         server = connection.server
         self.MainWindow.add_text(server, channel, '{} -{}- {}'.format(timestamp(), host.split('!')[0][1:], ' '.join(message)[1:]))
         return None
+
+    def onNICK(self, connection, host, newnickname):
+        old = host.split('!')[0][1:]
+        channels = self.MainWindow.servers[connection.server]['channels']
+        for channel in channels:
+            print( channel )
+            if old in channels[channel]['users']:
+                modes = channels[channel]['users'][old]
+                print( modes )
+                self.MainWindow.remove_user(connection.server, channel, old)
+                self.MainWindow.add_user(connection.server, channel, newnickname[1:], modes)
+                self.MainWindow.add_text(connection.server, channel, '{} {} is now known as {}'.format(timestamp(), old, newnickname[1:]))
+                self.MainWindow.change_treeview_color(connection.server, channel, '#AA00AA')
+        if host.split('!')[0][1:] == connection.nickname:
+            connection.nickname = newnickname[1:]
+        if host.split('!')[0][1:].lower() in self.MainWindow.servers[connection.server]['channels']:
+            text = self.MainWindow.servers[connection.server]['channels'][host.split('!')[0][1:].lower()]['text']
+            self.MainWindow.remove_channel(connection.server, host.split('!')[0][1:].lower())
+            self.MainWindow.add_channel(connection.server, newnickname[1:].lower())
+            self.MainWindow.add_text(connection.server, newnickname[1:].lower(), '\n'.join(text))
+            if self.MainWindow.active_channel == host.split('!')[0][1:]:
+                time.sleep(0.2)
+                self.MainWindow.activate_path(connection.server, newnickname[1:].lower())
+        return None
+
+    def onMODE(self, connection, setter, channel, mode, user=None):
+        channel = channel.lower()
+        if user == None:
+            user = setter.split('!')[0][1:]
+            if mode[0] == '+':
+                self.MainWindow.servers[connection.server]['usermode'] = [x for x in mode]
+            if mode[0] == '-':
+                for x in mode[1:]:
+                    self.MainWindow.servers[connection.server]['usermode'].pop(self.MainWindow.servers[connection.server]['usermode'].index(x))
+            return None
+        users = self.MainWindow.servers[connection.server]['channels'][channel]['users']
+        if mode[0] == '-':
+            users[user] = [x for x in users[user] if x not in mode]
+            if len(users[user]) == 0:
+                users[user] = None
+        if mode[0] == '+':
+            if user in users:
+                if users[user] == None:
+                    users[user] = []
+                users[user] = users[user] + [x for x in mode[1:]]
+        if self.MainWindow.active_server == connection.server and self.MainWindow.active_channel == channel:
+            self.MainWindow.redraw_userlist()
+        self.MainWindow.add_text(connection.server, channel, '{} {} sets mode {} on {}'.format(timestamp(), setter.split('!')[0][1:], mode, user))
+        self.MainWindow.change_treeview_color(connection.server, channel, '#AA00AA')
+        return None
+
 
 """
 :card.freenode.net NOTICE * :*** Looking up your hostname...

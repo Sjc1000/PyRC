@@ -1,4 +1,4 @@
-#!/usr/bin/env 
+#!/usr/bin/env python3
 
 
 import socket
@@ -40,30 +40,24 @@ class _Connection():
             try:
                 self.socket.connect((self.server, self.port))
             except TimeoutError:
-                self.MainWindow.add_text(self.server, None, 'Connection timed out.')
-                continue
-            except OSError as error_message:
-                message = str(error_message)
-                message = message[message.find(']')+1:]
-                self.MainWindow.add_text(self.server, None, 'Error:' + message)
-                return False
+                self.MainWindow.add_text(self.server, None, 'Connection Timed out.')
+                break
             except Exception as error_message:
                 self.MainWindow.add_text(self.server, None, 'Something went wrong: ' + str(error_message))
-                return False
+                break
             else:
                 self.MainWindow.add_text(self.server, None, 'Connected!')
                 if 'raw' not in self.MainWindow.servers[self.server]['channels'] and self.event_handler.show_raw is True:
                     self.MainWindow.add_channel(self.server, 'raw')
                 self.identify()
                 self.main_loop()
-                return True
-        self.MainWindow.add_text(self.server, None, 'Could not connect to the server.')
-        return False
+                break
+        return None
 
     def send(self, data):
         try:
             self.socket.send(bytes(data + '\r\n', 'utf-8'))
-        except BrokenPipeError:
+        except BrokenPipeError as Error:
             self.rejoin()
         return None
 
@@ -80,10 +74,9 @@ class _Connection():
         while True:
             try:
                 recv = self.socket.recv(1024)
-            except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            except (BrokenPipeError, ConnectionResetError, TimeoutError, OSError):
                 self.rejoin()
                 pass
-
             if recv == '':
                 for i in range(10):
                     recv = self.socket.recv(1024)
@@ -92,8 +85,6 @@ class _Connection():
                     if i == 9:
                         self.rejoin()
                         continue
-            
-            
             if recv.endswith(b'\r\n'):
                 self.event_handler.handle(self, prev + recv)
                 prev = b''
@@ -106,13 +97,19 @@ class _Connection():
                         prev += line
             else:
                 prev += recv
-
-
         return None
 
     def privmsg(self, channel, text):
-        self.MainWindow.add_text(self.MainWindow.active_server, self.MainWindow.active_channel, '{} [{}] {}'.format(timestamp(), self.nickname, text))
+        replace = {'\\x03': '\x03', '\\x02': '\x02', '\\x01': '\x01'}
+        for check in replace:
+            text = text.replace(check, replace[check])
+        self.MainWindow.add_text(self.MainWindow.active_server, channel, '{} [{}] {}'.format(timestamp(), self.nickname, text))
         self.send('PRIVMSG {} :{}'.format(channel, text))
+        return None
+
+    def CTCP(self, user, message):
+        self.MainWindow.add_text(self.server, self.MainWindow.active_channel, '{} -{}- CTCP request {}'.format(timestamp(), user, message))
+        self.send('PRIVMSG {} :\x01{}\x01'.format(user, message))
         return None
 
     def rejoin(self):
@@ -120,5 +117,5 @@ class _Connection():
                                  'reconnect.')
         time.sleep(10)
         self.MainWindow.add_text(self.server, None, 'Reconnecting.')
-        connected = self.connect()
+        self.connect()
         return None

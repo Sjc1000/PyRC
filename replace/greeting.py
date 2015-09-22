@@ -10,5 +10,5 @@ def run():
         return 'Morning all.'
     elif hour < 18:
         return 'Afternoon all.'
-    elif hour > 24:
+    elif hour < 24:
         return 'Evening all.'
