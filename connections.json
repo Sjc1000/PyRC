@@ -1,9 +1,2 @@
 {
-    "Bouncer":
-    {
-        "server": "irc.drix.xyz",
-        "port": 52310,
-        "nickname": "Sjc1000",
-        "password": "Sjc1000:a1b2c3d4e5"
-    }
 }
