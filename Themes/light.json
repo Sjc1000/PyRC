@@ -1,0 +1,64 @@
+{
+    "ServerList":
+    {
+        "JOIN": "#00AA00",
+        "PRIVMSG": "#FF0000",
+        "NICK": "#00AA00"
+    },
+    "ChatBox":
+    {
+        "matches": 
+        {
+            "^\\[.*?\\] ((.*?) \\((.*?)\\) has joined (.*?))$": 
+            {
+                "1": "green",
+                "2": "bold",
+                "3": "italic",
+                "4": "bold"
+            },
+            "^\\[.*?\\] ((.*?) \\((.*?)\\) has (?:quit|left) (.*?))$": 
+            {
+                "1": "red",
+                "2": "bold",
+                "3": "italic",
+                "4": "bold"
+            },
+            "^(\\[\\d+:\\d+:\\d+\\]).*?$":
+            {
+                "1": "purple,bold"
+            },
+            "((https?:\\/\\/|www.)(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))":
+            {
+                "0": "link"
+            }
+        },
+        "tags":
+        {
+            "red": {
+                "foreground": "#880000"
+            },
+            "green":
+            {
+                "foreground": "#008800"
+            },
+            "purple":
+            {
+                "foreground": "#880088"
+            },
+            "bold":
+            {
+                "weight": "!Pango.Weight.BOLD"
+            },
+            "italic":
+            {
+                "style": "!Pango.Style.ITALIC"
+            },
+            "link":
+            {
+                "connect": {"event": "url_clicked"},
+                "foreground": "#000099",
+                "underline": "!Pango.Underline.SINGLE"
+            }
+        }
+    }
+}

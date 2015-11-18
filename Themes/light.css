@@ -1,0 +1,24 @@
+* {
+    background-color: #EEE;
+    color: #000;
+}
+GtkEntry,GtkTreeView,GtkTextView {
+    background: #FFF;
+    color: #000;
+}
+GtkEntry {
+    border: 1px solid #000;
+    border-radius: 0px;
+}
+GtkTreeView row:focused {
+    background: #AAA;
+}
+.slider {
+    background-color: #888;
+}
+GtkTreeView row:prelight {
+    background: #999;
+}
+GtkTreeView row:selected {
+    background: #AAA;
+}

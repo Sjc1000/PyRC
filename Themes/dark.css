@@ -1,0 +1,39 @@
+* {
+    background-color: #222;
+    color: #EEE;
+}
+GtkEntry,GtkTreeView,GtkTextView {
+    background: #333;
+    color: #EEE;
+}
+GtkEntry {
+    border: none;
+    border-radius: 0px;
+}
+GtkTextView:selected,
+GtkEntry:selected {
+    color: #555;
+    background: #eee;
+}
+GtkEntry:focused {
+    background-color: #393939;
+}
+GtkTreeView row * {
+    margin: 0px;
+    padding: 0px;
+}
+GtkTreeView row:focused {
+    background: #444;
+}
+GtkTreeView row:prelight {
+    background: #222222;
+}
+GtkTreeView row:selected {
+    background: #444;
+}
+GtkTreeView row:active {
+    background: #393939;
+}
+.slider {
+    background-color: #EEE;
+}

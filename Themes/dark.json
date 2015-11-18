@@ -1,0 +1,82 @@
+{
+    "ServerList":
+    {
+        "JOIN": "#00AA00",
+        "PRIVMSG": "#FF0000",
+        "NICK": "#00AA00"
+    },
+    "ChatBox":
+    {
+        "matches": 
+        {
+            "^\\[.*?\\] ((.*?) \\((.*?)\\) has joined (.*?))$": 
+            {
+                "1": "green",
+                "2": "bold",
+                "3": "italic",
+                "4": "bold"
+            },
+            "^\\[.*?\\] ((.*?) \\((.*?)\\) has (?:quit|left) (.*?))$": 
+            {
+                "1": "red",
+                "2": "bold",
+                "3": "italic",
+                "4": "bold"
+            },
+            "^(\\[\\d+:\\d+:\\d+\\]).*?$":
+            {
+                "1": "purple,bold"
+            },
+            "((https?:\\/\\/|www.)(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))":
+            {
+                "0": "link"
+            },
+            "^\\[.*?\\]\\s(\\*\\s.*?\\s|.*?\\s-).*?$":
+            {
+                "1": "bold"
+            },
+            "^\\[.*?\\] ((.*?) is now known as (.*?))$": 
+            {
+                "2": "bold",
+                "3": "bold"
+            },
+            "(\\\\x\\d+).*?(\\\\x\\d+)":
+            {
+                "1": "hidden",
+                "2": "hidden"
+            }
+        },
+        "tags":
+        {
+            "red": {
+                "foreground": "#EE0000"
+            },
+            "green":
+            {
+                "foreground": "#00EE00"
+            },
+            "purple":
+            {
+                "foreground": "#EE00EE"
+            },
+            "bold":
+            {
+                "weight": "!Pango.Weight.BOLD"
+            },
+            "italic":
+            {
+                "style": "!Pango.Style.ITALIC"
+            },
+            "link":
+            {
+                "connect": {"event": "url_clicked"},
+                "foreground": "#7777FF",
+                "underline": "!Pango.Underline.SINGLE"
+            },
+            "hidden":
+            {
+                "invisible": true
+            }
+        }
+    }
+}
